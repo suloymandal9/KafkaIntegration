@@ -2,6 +2,7 @@
 
 package Practice_Project1.practiceProjectSpring.Controller;
 
+import Practice_Project1.practiceProjectSpring.DTO.EmployeeEvent;
 import Practice_Project1.practiceProjectSpring.Producer.EmployeeKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +15,11 @@ public class KafkaController {
 
     private final EmployeeKafkaProducer employeeKafkaProducer;
 
-    @PostMapping("/kafkaSend")
-    public String sendMessage(@RequestParam String message) {
+    @PostMapping("/send")
+    public String sendMessage(@RequestBody EmployeeEvent event) {
 
-        employeeKafkaProducer.sendMessage(message);
+        employeeKafkaProducer.sendMessage(event);
 
-        return "Message sent successfully";
+        return "Employee Event sent successfully";
     }
 }
