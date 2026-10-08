@@ -99,3 +99,134 @@ KafkaTemplate
 JSON Serialization
   ↓
 Kafka Topic
+
+
+
+## 8.Implement Kafka Consumer
+
+After producing the event to Kafka, I implemented a Kafka Consumer using Spring Kafka's @KafkaListener.
+
+Why?
+The producer sends messages to Kafka, while the consumer reads and processes those messages from the Kafka topic.
+
+The flow is:
+
+Kafka Topic
+     ↓
+Kafka Consumer
+     ↓
+Process EmployeeEvent
+
+I configured the consumer with a consumer group called employee-group.
+
+Consumer Group: A group of consumers that work together to consume messages from Kafka.
+
+## 9.JSON Deserialization
+
+Since the producer sends the EmployeeEvent as JSON, the consumer needs to convert that JSON back into a Java object.
+
+I configured JacksonJsonDeserializer.
+
+Deserialization means converting the received JSON data back into a Java object.
+
+Kafka
+   ↓
+JSON
+   ↓
+JacksonJsonDeserializer
+   ↓
+EmployeeEvent
+
+So the consumer-side flow is:
+
+Kafka Topic
+     ↓
+JSON Message
+     ↓
+JSON Deserialization
+     ↓
+EmployeeEvent
+     ↓
+Kafka Consumer
+
+
+## 10.Kafka Partitions
+
+I created the employee-events topic with 2 partitions.
+
+A partition is an ordered sequence of messages inside a Kafka topic.
+
+employee-events
+
+Partition 0
+-----------
+Message 1
+Message 3
+Message 5
+
+Partition 1
+-----------
+Message 2
+Message 4
+Message 6
+
+Why?
+Partitions allow Kafka to distribute messages and provide parallelism and scalability.
+
+## 11.Consumer Group
+
+I configured my consumer with:
+
+employee-group
+
+Consumers belonging to the same consumer group can share the partitions of a topic.
+
+For example:
+
+2 Partitions
+      ↓
+Consumer 1 → Partition 0
+Consumer 2 → Partition 1
+
+Important: Within the same consumer group, one partition is assigned to only one consumer at a time.
+
+## 12.Kafka Offset
+
+Kafka maintains an offset for each message within a partition.
+
+For example:
+
+Partition 0
+
+Offset 0 → Message 1
+Offset 1 → Message 2
+Offset 2 → Message 3
+
+Why?
+The offset allows Kafka to keep track of the consumer's progress.
+
+In simple terms:
+
+Offset tells Kafka where the consumer is in the partition.
+
+## 13.Acknowledgement and Offset Management
+
+After a consumer receives a message, we need to consider whether the message was actually processed successfully.
+
+The basic flow is:
+
+Kafka Message
+     ↓
+Consumer
+     ↓
+Process Message
+     ↓
+Successful Processing
+     ↓
+Acknowledgement
+     ↓
+Offset Commit
+
+Why is this important?
+
+If the application fails before processing is completed, we don't want Kafka to incorrectly consider the message successfully processed.
